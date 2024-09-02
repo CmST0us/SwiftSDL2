@@ -1,4 +1,4 @@
-import SDL
+import SDL2
 import GLEW
 
 func sdldie(_ msg: String) {
@@ -34,6 +34,22 @@ SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24)
 mainwindow = SDL_CreateWindow(PROGRAM_NAME, Int32(SDL_WINDOWPOS_CENTERED_MASK), Int32(SDL_WINDOWPOS_CENTERED_MASK),
                               512, 512, SDL_WINDOW_OPENGL.rawValue | SDL_WINDOW_SHOWN.rawValue)
 
+SDL_SetWindowOpacity(mainwindow, 0.5)
+
+var wmInfo: SDL_SysWMinfo = SDL_SysWMinfo()
+wmInfo.version.major = UInt8(SDL_MAJOR_VERSION)
+wmInfo.version.minor = UInt8(SDL_MINOR_VERSION)
+wmInfo.version.patch = UInt8(SDL_PATCHLEVEL)
+
+let result = SDL_GetWindowWMInfo(mainwindow, &wmInfo)
+print("Get Window WM Info result: \(result)")
+
+if wmInfo.subsystem == SDL_SYSWM_WAYLAND {
+    print("Run on wayland")
+} else if wmInfo.subsystem == SDL_SYSWM_X11 {
+    print("Run on x11")
+}
+
 if mainwindow == nil {
     sdldie("Unable to create window")
 }
@@ -43,7 +59,10 @@ checkSDLError(line: #line)
 maincontext = SDL_GL_CreateContext(mainwindow)
 checkSDLError(line: #line)
 
-SDL_GL_SetSwapInterval(1)
+SDL_GL_MakeCurrent(mainwindow, maincontext)
+
+glEnable(GLenum(GL_BLEND))
+glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
 
 // Vertex shader source
 let vertexSource = """
@@ -61,7 +80,7 @@ let fragmentSource = """
 out vec4 outColor;
 void main()
 {
-    outColor = vec4(1.0, 1.0, 1.0, 1.0);
+    outColor = vec4(0.0, 1.0, 0.0, 1.0);
 }
 """
 
@@ -127,7 +146,7 @@ while running {
     }
 
     // Clear the screen
-    glClearColor(0.0, 0.0, 0.0, 1.0)
+    glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GLenum(GL_COLOR_BUFFER_BIT))
 
     // Draw the triangle
