@@ -8,7 +8,10 @@ let package = Package(
                  targets: ["SDL2"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/CmST0us/SwiftGLEW", branch: "main")  
+        .package(url: "https://github.com/CmST0us/SwiftGLEW", branch: "main"),
+        .package(url: "https://github.com/CmST0us/SwiftCEGL", branch: "main"),
+        .package(url: "https://github.com/CmST0us/SwiftCWaylandClient", branch: "main"),
+        .package(url: "https://github.com/CmST0us/SwiftCWaylandEGL", branch: "main"),
     ],
     targets: [
         .target(name: "SDL2",
@@ -28,8 +31,11 @@ let package = Package(
         .executableTarget(
             name: "Minimal", 
             dependencies: [
-                "SDL2", 
-                .product(name: "GLEW", package: "SwiftGLEW")
+                "SDL2",
+                .product(name: "CEGL", package: "SwiftCEGL"),
+                .product(name: "CWaylandClient", package: "SwiftCWaylandClient"),
+                .product(name: "CWaylandEGL", package: "SwiftCWaylandEGL"),
+                .product(name: "GLEW", package: "SwiftGLEW"),
             ], 
             path: "Sources/Demos/Minimal")
     ]
