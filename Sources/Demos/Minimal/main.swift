@@ -1,26 +1,5 @@
 import SDL2
 import GLEW
-import CWaylandClient
-
-setenv("SDL_VIDEODRIVER", "wayland", 1)
-// setenv("WAYLAND_DEBUG", "1", 1)
-
-var waylandCompositorInterface = wl_compositor_interface
-var waylandCompositior: OpaquePointer?
-
-func registry_global(_ data: UnsafeMutableRawPointer?, _ registry: OpaquePointer?, _ id: UInt32, _ interface: UnsafePointer<CChar>?, _ version: UInt32) {
-    print("registry global has attach: \(String(cString: interface!)), version: \(version), id: \(id)")
-    let interfaceString = String(cString: interface!)
-    if interfaceString == String(cString: wl_compositor_interface.name) {
-        let compositor = wl_registry_bind(registry, id, &waylandCompositorInterface, version)!
-        waylandCompositior = OpaquePointer(compositor)
-    }
-    
-}
-
-func registry_remove(_ data: UnsafeMutableRawPointer?, _ registry: OpaquePointer?, _ id: UInt32) {
-    print("registry global has remove")
-}
 
 func sdldie(_ msg: String) {
     print("\(msg): \(String(cString: SDL_GetError()))")
@@ -69,14 +48,6 @@ if wmInfo.subsystem == SDL_SYSWM_WAYLAND {
     print("Run on x11")
 }
 
-let waylandSurface = wmInfo.info.wl.surface
-let waylandDisplay = wmInfo.info.wl.display
-let waylandRegistry = wl_display_get_registry(waylandDisplay)
-
-var listener: wl_registry_listener = wl_registry_listener()
-listener.global = registry_global
-listener.global_remove = registry_remove
-wl_registry_add_listener(waylandRegistry, &listener, nil)
 
 if mainwindow == nil {
     sdldie("Unable to create window")
@@ -180,14 +151,6 @@ while running {
     // Draw the triangle
     glDrawArrays(GLenum(GL_TRIANGLES), 0, 3)
 
-    // Opaque
-    let region = wl_compositor_create_region(waylandCompositior!)
-    wl_region_add(region, 0, 0, 512, 512)
-
-    wl_surface_set_opaque_region(waylandSurface!, region)
-    wl_region_destroy(region)
-    
-    wl_surface_frame(waylandSurface!)
     // Swap buffers
     SDL_GL_SwapWindow(mainwindow)
 }
