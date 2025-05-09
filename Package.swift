@@ -37,6 +37,11 @@ let package = Package(
                 .product(name: "CWaylandEGL", package: "SwiftCWaylandEGL"),
                 .product(name: "GLEW", package: "SwiftGLEW"),
             ], 
-            path: "Sources/Demos/Minimal")
+            path: "Sources/Demos/Minimal"),
+
+        .executableTarget(
+            name: "MonoGraphics",
+            dependencies: ["SDL2"],
+            path: "Sources/Demos/MonoGraphics"),
     ]
 )
